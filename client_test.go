@@ -16,6 +16,4 @@ func Test_GetAClientWithProperData(t *testing.T) {
   }
 }
 
-func Test_Post(t *testing.T) {
-  
-}
+

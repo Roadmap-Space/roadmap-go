@@ -24,7 +24,8 @@ type Client struct {
 
 	Roadmaps *Roadmaps
 	Feedback *Feedback
-	Items *Items
+	Ideas    *Ideas
+	Items    *Items
 }
 
 // New creates a new Client
@@ -38,7 +39,8 @@ func New(email, token string) *Client {
 		BasePath: "http://localhost:8070/v1",
 		Roadmaps: &Roadmaps{EndpointURL: "/roadmaps"},
 		Feedback: &Feedback{Endpoint: "/feedback"},
-		Items: &Items{EndpointURL: "/items"},
+		Ideas:    &Ideas{Endpoint: "/ideas"},
+		Items:    &Items{EndpointURL: "/items"},
 	}
 
 	return apiClient
@@ -57,6 +59,10 @@ func (api *Client) get(path string, result interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("Error requesting %s returned %s", path, resp.Status)
+	}
 
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(result); err != nil {
