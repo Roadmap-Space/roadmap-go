@@ -8,10 +8,9 @@ type Feedback struct {
 }
 
 // Create adds a new feedback
-func (f *Feedback) Create(roadmapID, title string) (*Item, error) {
+func (f *Feedback) Create(item UserFeedback) (*UserFeedback, error) {
 	path := fmt.Sprintf("%s", f.Endpoint)
 
-	item := Item{RoadmpID: roadmapID, Title: title}
 	if err := apiClient.post(path, item, &item); err != nil {
 		return nil, err
 	}
@@ -19,9 +18,9 @@ func (f *Feedback) Create(roadmapID, title string) (*Item, error) {
 }
 
 // Get returns a feedback by its id and token
-func (f *Feedback) Get(id, token string) (*Item, error) {
+func (f *Feedback) Get(id, token string) (*UserFeedback, error) {
 	path := fmt.Sprintf("%s/%s/todo-remove-this", f.Endpoint, idToURL(id, token))
-	var feedback Item
+	var feedback UserFeedback
 	if err := apiClient.get(path, &feedback); err != nil {
 		return nil, err
 	}
@@ -39,13 +38,24 @@ func (f *Feedback) List(roadmapID string) ([]Item, error) {
 }
 
 // Convert
-func (f *Feedback) Convert(id, token string) error {
-	apiID := idToURL(id, token)
+func (f *Feedback) Convert(roadmapID, id, token string) (bool, error) {
+	path := fmt.Sprintf("%s/convert", f.Endpoint)
+
+	var data = new(struct{
+		RoadmapID string `json:"roadmapId"`
+		FeedbackID string `json:"feedbackId"`
+		Token string `json:"token"`
+	})
+
+	data.RoadmapID = roadmapID
+	data.FeedbackID = id
+	data.Token = token
+
 	var result bool
-	if err := apiClient.put(fmt.Sprintf("%s/convert/%s", f.Endpoint, apiID), nil, &result); err != nil {
-		return err
+	if err := apiClient.put(path, data, &result); err != nil {
+		return false, err
 	}
-	return nil
+	return result, nil
 }
 
 type FeedbackMergeParams struct {
@@ -74,4 +84,15 @@ func (f *Feedback) Merge(params *FeedbackMergeParams) (bool, error) {
 		return false, err
 	}
 	return status, nil
+}
+
+func (f *Feedback) Delete(id, token string) (bool, error) {
+	path := fmt.Sprintf("%s/%s", f.Endpoint, idToURL(id, token))
+
+	var result bool
+	err := apiClient.delete(path, &result)
+	if err != nil {
+		return false, err
+	}
+	return result, nil
 }

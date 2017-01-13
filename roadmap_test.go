@@ -3,7 +3,13 @@ package roadmap_test
 import (
 	"fmt"
 	"testing"
+
+	roadmap "github.com/roadmap-space/roadmap-go"
 )
+
+func createRoadmap(title string) (*roadmap.Roadmap, error) {
+	return c.Roadmaps.Create(title)
+}
 
 func Test_RoadmapsGetWidgetIdeas(t *testing.T) {
 	t.Parallel()

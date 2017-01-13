@@ -36,7 +36,7 @@ func New(email, token string) *Client {
 		email:    email,
 		token:    token,
 		c:        httpClient,
-		BasePath: "http://localhost:8070/v1",
+		BasePath: "https://app.roadmap.space/v1",
 		Roadmaps: &Roadmaps{EndpointURL: "/roadmaps"},
 		Feedback: &Feedback{Endpoint: "/feedback"},
 		Ideas:    &Ideas{Endpoint: "/ideas"},
@@ -94,6 +94,10 @@ func (api *Client) post(path string, data interface{}, result interface{}) error
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("Error requesting %s returned %s", path, resp.Status)
+	}
+
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(result); err != nil {
 		return err
@@ -120,6 +124,10 @@ func (api *Client) put(path string, data interface{}, result interface{}) error 
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("Error requesting %s returned %s", path, resp.Status)
+	}
+
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(result); err != nil {
 		return err
@@ -140,6 +148,10 @@ func (api *Client) delete(path string, result interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("Error requesting %s returned %s", path, resp.Status)
+	}
 
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(result); err != nil {

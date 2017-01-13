@@ -9,11 +9,15 @@ type Roadmaps struct {
 	EndpointURL string
 }
 
-// Roadmap represents a Roadmap object
-type Roadmap struct {
-	ID        string `json:"id"`
-	AccountID string `json:"accountId"`
-	Name      string `json:"name"`
+// Create adds a roadmap
+func (r *Roadmaps) Create(title string) (*Roadmap, error) {
+	path := fmt.Sprintf("%s", r.EndpointURL)
+
+	roadmap := Roadmap{Title: title}
+	if err := apiClient.post(path, roadmap, &roadmap); err != nil {
+		return nil, err
+	}
+	return &roadmap, nil
 }
 
 // List returns a list of Roadmap for the autneticated account
@@ -29,12 +33,23 @@ func (r *Roadmaps) List() ([]Roadmap, error) {
 }
 
 // GetWidgetIdeas returns the ideas available for the widget
-func (r *Roadmaps) GetWidgetIdeas(roadmapID string) ([]Item, error) {
+func (r *Roadmaps) GetWidgetIdeas(roadmapID string) ([]Idea, error) {
 	path := fmt.Sprintf("%s/%s/widget", r.EndpointURL, roadmapID)
 
-	var items []Item
-	if err := apiClient.get(path, &items); err != nil {
+	var ideas []Idea
+	if err := apiClient.get(path, &ideas); err != nil {
 		return nil, err
 	}
-	return items, nil
+	return ideas, nil
+}
+
+// Delete permanently remove a rodamap and all related resources
+func (r *Roadmaps) Delete(id string) (bool, error) {
+	path := fmt.Sprintf("%s/%s", r.EndpointURL, id)
+
+	var result bool
+	if err := apiClient.delete(path, &result); err != nil {
+		return false, err
+	}
+	return result, nil
 }
