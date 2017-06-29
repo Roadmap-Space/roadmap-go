@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -25,21 +26,27 @@ type Client struct {
 	Roadmaps *Roadmaps
 	Feedback *Feedback
 	Ideas    *Ideas
+	Stories  *Stories
 	Items    *Items
 }
 
 // New creates a new Client
 func New(email, token string) *Client {
-	//TODO: We need to have a production basepath
+	basePath := "https://app.roadmap.space/v1"
+	if os.Getenv("RM_DEBUG") == "1" {
+		basePath = "http://localhost:8070/v1"
+	}
+
 	httpClient := &http.Client{Timeout: HTTPTimeout}
 	apiClient = &Client{
 		email:    email,
 		token:    token,
 		c:        httpClient,
-		BasePath: "https://app.roadmap.space/v1",
+		BasePath: basePath,
 		Roadmaps: &Roadmaps{EndpointURL: "/roadmaps"},
-		Feedback: &Feedback{Endpoint: "/feedback"},
-		Ideas:    &Ideas{Endpoint: "/ideas"},
+		Feedback: &Feedback{EndpointURL: "/feedback"},
+		Ideas:    &Ideas{EndpointURL: "/ideas"},
+		Stories:  &Stories{EndpointURL: "/stories"},
 		Items:    &Items{EndpointURL: "/items"},
 	}
 

@@ -8,7 +8,11 @@ import (
 )
 
 func createIdea(roadmapID, title string) (*roadmap.Idea, error) {
-	return c.Ideas.Create(roadmapID, title)
+	idea := roadmap.Idea{}
+	idea.RoadmapID = roadmapID
+	idea.Title = title
+
+	return c.Ideas.Create(idea)
 }
 
 func Test_IdeaCreate(t *testing.T) {
@@ -152,9 +156,39 @@ func Test_IdeaUpdate(t *testing.T) {
 
 	i.Description = "## this is markdown"
 
-	if ok, err := c.Ideas.Update(*i); err != nil {
+	if u, err := c.Ideas.Update(*i); err != nil {
 		t.Fatal(err)
-	} else if !ok {
+	} else if u == nil {
 		t.Errorf("unable to update the idea")
+	}
+}
+
+func Test_IdeaConvert(t *testing.T) {
+	t.Parallel()
+
+	idea, err := createIdea(testRoadmapID, "new idea to convert")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := c.Ideas.Convert(testRoadmapID, idea.ID, idea.Token); err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := c.Stories.List(testRoadmapID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	found := false
+	for _, s := range check {
+		if s.ID == idea.ID {
+			found = true
+			break
+		}
+	}
+
+	if found == false {
+		t.Error("the idea converted to story were not found in the roadmap stories")
 	}
 }

@@ -91,7 +91,7 @@ type BaseItem struct {
 	Hidden           bool         `json:"hidden"`
 	Order            int          `json:"order"`
 	Subscribers      []Subscriber `json:"subscribers"`
-	Token            string       `bson:"json:"token"`
+	Token            string       `json:"token"`
 	SubscribersCount int          `json:"subscribersCount"`
 	RevenueTotal     int          `json:"revenue"`
 	Owner            Owner        `json:"owner"`
@@ -124,7 +124,7 @@ type Idea struct {
 type Story struct {
 	Idea
 	Clap        int       `json:"clap"`
-	Tasks       []Task    `json:"tasks"`
+	Attached    []Idea    `json:"attached"`
 	Completed   bool      `json:"completed"`
 	CompletedOn time.Time `json:"completedOn"`
 }

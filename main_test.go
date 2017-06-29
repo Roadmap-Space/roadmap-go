@@ -3,6 +3,7 @@ package roadmap_test
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	roadmap "github.com/roadmap-space/roadmap-go"
@@ -13,7 +14,12 @@ var c *roadmap.Client
 var testRoadmapID = ""
 
 func TestMain(m *testing.M) {
-	c = roadmap.New("dominic@roadmap.space", "5829ded880309d0420adde35|307b31dd-06e8-434a-8c4c-9278f08c9276")
+	os.Setenv("RM_DEBUG", "1")
+	c = roadmap.New("dominic@roadmap.space", "57b8488ac7899e5cb4337ea1|ebd5361a-95d9-466f-8d94-26d157f9afea")
+	if strings.Index(c.BasePath, "localhost") == -1 {
+		fmt.Printf("base path is %s and should be localhost", c.BasePath)
+		os.Exit(0)
+	}
 
 	r, err := createRoadmap("unit test")
 	if err != nil {

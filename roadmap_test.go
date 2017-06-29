@@ -1,7 +1,6 @@
 package roadmap_test
 
 import (
-	"fmt"
 	"testing"
 
 	roadmap "github.com/roadmap-space/roadmap-go"
@@ -14,16 +13,19 @@ func createRoadmap(title string) (*roadmap.Roadmap, error) {
 func Test_RoadmapsGetWidgetIdeas(t *testing.T) {
 	t.Parallel()
 
-	roadmaps, err := c.Roadmaps.List()
+	// make sure we have one idea in widget
+	idea, err := createIdea(testRoadmapID, "new in widget")
 	if err != nil {
-		t.Fatal(err)
-	} else if len(roadmaps) < 1 {
-		t.Fatal("We don't have any roadmap")
+		t.Fatal("Unable to create idea", err)
 	}
 
-	fmt.Println(roadmaps[0].ID)
+	if ok, err := c.Ideas.ToWidget(idea.ID, testRoadmapID, idea.Token); err != nil {
+		t.Fatal("unable to tag an idea as in widget", err)
+	} else if ok == false {
+		t.Fatalf("api returned false for tagging idea to as in widget")
+	}
 
-	items, err := c.Roadmaps.GetWidgetIdeas(roadmaps[0].ID)
+	items, err := c.Roadmaps.GetWidgetIdeas(testRoadmapID)
 	if err != nil {
 		t.Error(err)
 	} else if len(items) < 1 {

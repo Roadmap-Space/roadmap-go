@@ -2,14 +2,14 @@ package roadmap
 
 import "fmt"
 
-// Feedback
+// Feedback used to call all feedback related endpoints
 type Feedback struct {
-	Endpoint string
+	EndpointURL string
 }
 
 // Create adds a new feedback
 func (f *Feedback) Create(item UserFeedback) (*UserFeedback, error) {
-	path := fmt.Sprintf("%s", f.Endpoint)
+	path := fmt.Sprintf("%s", f.EndpointURL)
 
 	if err := apiClient.post(path, item, &item); err != nil {
 		return nil, err
@@ -19,7 +19,7 @@ func (f *Feedback) Create(item UserFeedback) (*UserFeedback, error) {
 
 // Get returns a feedback by its id and token
 func (f *Feedback) Get(id, token string) (*UserFeedback, error) {
-	path := fmt.Sprintf("%s/%s/todo-remove-this", f.Endpoint, idToURL(id, token))
+	path := fmt.Sprintf("%s/%s", f.EndpointURL, idToURL(id, token))
 	var feedback UserFeedback
 	if err := apiClient.get(path, &feedback); err != nil {
 		return nil, err
@@ -27,9 +27,9 @@ func (f *Feedback) Get(id, token string) (*UserFeedback, error) {
 	return &feedback, nil
 }
 
-// List
+// List returns the feedback list for a specific roadmap
 func (f *Feedback) List(roadmapID string) ([]Item, error) {
-	path := fmt.Sprintf("%s/list/%s", f.Endpoint, roadmapID)
+	path := fmt.Sprintf("%s/list/%s", f.EndpointURL, roadmapID)
 	var result []Item
 	if err := apiClient.get(path, &result); err != nil {
 		return nil, err
@@ -37,18 +37,13 @@ func (f *Feedback) List(roadmapID string) ([]Item, error) {
 	return result, nil
 }
 
-// Convert
-func (f *Feedback) Convert(roadmapID, id, token string) (bool, error) {
-	path := fmt.Sprintf("%s/convert", f.Endpoint)
+// Convert converts a feedback into an idea
+func (f *Feedback) Convert(roadmapID, feedbackID, token string) (bool, error) {
+	path := fmt.Sprintf("%s/convert", f.EndpointURL)
 
-	var data = new(struct{
-		RoadmapID string `json:"roadmapId"`
-		FeedbackID string `json:"feedbackId"`
-		Token string `json:"token"`
-	})
-
+	data := UserFeedback{}
 	data.RoadmapID = roadmapID
-	data.FeedbackID = id
+	data.ID = feedbackID
 	data.Token = token
 
 	var result bool
@@ -58,36 +53,41 @@ func (f *Feedback) Convert(roadmapID, id, token string) (bool, error) {
 	return result, nil
 }
 
-type FeedbackMergeParams struct {
-	ID              string `json:"id"`
-	SourceID        string `json:"-"`
-	SourceToken     string `json:"-"`
-	TargetID        string `json:"targetId"`
-	TargetRoadmapID string `json:"roadmapId"`
+// FeedbackAttachParams is used to attach a feedback to an idea or story
+type FeedbackAttachParams struct {
+	SourceID    string `json:"sourceId"`
+	SourceToken string `json:"sourceToken"`
+	ParentID    string `json:"parentId"`
+	ParentToken string `json:"parentToken"`
 }
 
-func (f *Feedback) Merge(params *FeedbackMergeParams) (bool, error) {
-	path := fmt.Sprintf("%s/merge", f.Endpoint)
+// Attach adds a feedback to an existing idea or story
+func (f *Feedback) Attach(p FeedbackAttachParams) (*UserFeedback, error) {
+	path := fmt.Sprintf("%s/attach", f.EndpointURL)
 
-	if len(params.SourceID) == 0 || len(params.SourceToken) == 0 {
-		return false, fmt.Errorf("you need to supply the source id and source token")
-	} else if len(params.TargetID) == 0 {
-		return false, fmt.Errorf("you need to supply the target id")
-	} else if len(params.TargetRoadmapID) == 0 {
-		return false, fmt.Errorf("you need to supply the roadmap id")
+	var result UserFeedback
+	if err := apiClient.post(path, p, &result); err != nil {
+		return nil, err
 	}
 
-	params.ID = idToURL(params.SourceID, params.SourceToken)
-
-	var status bool
-	if err := apiClient.put(path, params, &status); err != nil {
-		return false, err
-	}
-	return status, nil
+	return &result, nil
 }
 
+// UnLink removes the link created when feedback were attached to an idea or a story
+func (f *Feedback) UnLink(id, token, parentID string) (ok bool, err error) {
+	path := fmt.Sprintf("%s/%s/unlink/%s", f.EndpointURL, idToURL(id, token), parentID)
+
+	var result bool
+	if err = apiClient.delete(path, &result); err != nil {
+		return
+	}
+	ok = result
+	return
+}
+
+// Delete deletes a feedback
 func (f *Feedback) Delete(id, token string) (bool, error) {
-	path := fmt.Sprintf("%s/%s", f.Endpoint, idToURL(id, token))
+	path := fmt.Sprintf("%s/%s", f.EndpointURL, idToURL(id, token))
 
 	var result bool
 	err := apiClient.delete(path, &result)

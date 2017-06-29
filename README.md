@@ -1,10 +1,10 @@
 # Go Roadmap
 
-Side note: We are building this package live [here](https://www.livecoding.tv/dstpierre).
+Version: v1.2.0
 
 ## Summary
 
-Official Go API client library for Roadmap's API.
+Official Go API client library for [Roadmap](https://roadmap.space)'s API.
 
 ## Installation
 
