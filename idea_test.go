@@ -175,7 +175,8 @@ func Test_IdeaConvert(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	check, err := c.Stories.List(testRoadmapID)
+	p := &roadmap.StoryListParams{RoadmapID: testRoadmapID}
+	check, err := c.Stories.List(p)
 	if err != nil {
 		t.Fatal(err)
 	}

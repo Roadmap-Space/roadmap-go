@@ -105,28 +105,29 @@ type BaseItem struct {
 // UserFeedback represents user feedback
 type UserFeedback struct {
 	BaseItem
-	Comments []Comment `json:"comments"`
+	Comments     []Comment `json:"comments"`
+	CommentCount int       `json:"commentsCount"`
 }
 
 // Idea represents an idea
 type Idea struct {
 	UserFeedback
-	Like      int      `json:"like"`
-	Value     int      `json:"value"`
-	Effort    int      `json:"effort"`
-	Mockups   []Mockup `json:"mockups"`
-	Category  string   `json:"category"`
-	Team      string   `json:"team"`
-	Published bool     `json:"published"`
+	Like        int       `json:"like"`
+	Value       int       `json:"value"`
+	Effort      int       `json:"effort"`
+	Mockups     []Mockup  `json:"mockups"`
+	Category    string    `json:"category"`
+	Team        string    `json:"team"`
+	Published   bool      `json:"published"`
+	Completed   bool      `json:"completed"`
+	CompletedOn time.Time `json:"completedOn"`
 }
 
 // Story represents a roadmap story
 type Story struct {
 	Idea
-	Clap        int       `json:"clap"`
-	Attached    []Idea    `json:"attached"`
-	Completed   bool      `json:"completed"`
-	CompletedOn time.Time `json:"completedOn"`
+	Clap     int    `json:"clap"`
+	Attached []Idea `json:"attached"`
 }
 
 // Item to stay temporarily backward compatible
@@ -136,8 +137,10 @@ type Item struct {
 
 // Owner represents the owner of an item
 type Owner struct {
+	UserID          string `json:"userId"`
 	FirstName       string `json:"first"`
 	LastName        string `json:"last"`
+	Email           string `json:"email"`
 	Avatar          string `json:"avatar"`
 	Via             string `json:"via"`
 	ViaRef          string `json:"link"`
@@ -161,6 +164,10 @@ const (
 	CommentTypeMessage
 	// CommentTypeLike represents a team member liking an idea
 	CommentTypeLike
+	// CommentTypeEmail represents an email sent to follower
+	CommentTypeEmail
+	// CommentTypePublic represents a public comment
+	CommentTypePublic
 )
 
 // Comment represents a comment left by team member on an item
@@ -168,6 +175,7 @@ type Comment struct {
 	ID       string    `json:"id"`
 	Type     int       `json:"type"`
 	Name     string    `json:"name"`
+	Email    string    `json:"email"`
 	Gravatar string    `json:"gravatar"`
 	Body     string    `json:"body"`
 	Created  time.Time `json:"created"`

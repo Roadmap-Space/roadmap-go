@@ -53,3 +53,14 @@ func (r *Roadmaps) Delete(id string) (bool, error) {
 	}
 	return result, nil
 }
+
+// IdentifyUser takes a user and either creates or updates the attributes from the map
+func (r *Roadmaps) IdentifyUser(roadmapID string, data map[string]interface{}) (bool, error) {
+	path := fmt.Sprintf("%s/%s/widgetidentify", r.EndpointURL, roadmapID)
+
+	var result bool
+	if err := apiClient.post(path, data, &result); err != nil {
+		return false, err
+	}
+	return result, nil
+}
