@@ -1,19 +1,17 @@
 package roadmap_test
 
 import (
-  "testing"
+	"testing"
 
-  roadmap "github.com/roadmap-space/roadmap-go"
+	roadmap "github.com/roadmap-space/roadmap-go"
 )
 
 func Test_GetAClientWithProperData(t *testing.T) {
-  t.Parallel()
+	t.Parallel()
 
-  testClient := roadmap.New("test", "test")
+	testClient := roadmap.New("test", "test")
 
-  if testClient.BasePath != "http://localhost:8070/v1" {
-    t.Fail()
-  }
+	if testClient.BasePath != "http://localhost:8070/v1" {
+		t.Fail()
+	}
 }
-
-

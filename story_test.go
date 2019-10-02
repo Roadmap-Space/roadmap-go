@@ -40,4 +40,3 @@ func Test_StoriesList(t *testing.T) {
 		t.Error("Story list does not return newly created story")
 	}
 }
-
