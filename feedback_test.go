@@ -3,7 +3,7 @@ package roadmap_test
 import (
 	"testing"
 
-	"github.com/roadmap-space/roadmap-go"
+	roadmap "github.com/roadmap-space/roadmap-go"
 )
 
 func createFeedback(roadmapID, title string) (*roadmap.UserFeedback, error) {

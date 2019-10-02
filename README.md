@@ -21,7 +21,7 @@ Here is some examples:
 ### Get the ideas shown on the widget
 
 ```go
-import "github.com/roadmap-space/roadmap-go
+import "github.com/roadmap-space/roadmap-go"
 
 client := roadmap.New("email", "token")
 ideas, err := client.Roadmaps.GetWidgetIdeas("[roadmap id here]")
